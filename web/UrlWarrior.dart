@@ -10,23 +10,25 @@ main() {
 
 class UrlWarriorGameManager {
   
-  const String _WELCOME_MSG = "The Game is in the url. Press space to start !";
+  const String _WELCOME_MSG = "The Game is in the url. Press space to start ! Press 'H' for Help";
   final UrlWarriorGame _game;
   Timer _gameTimer;
   final Location location;
   //int _speed;
   
   UrlWarriorGameManager(this.location) : _game = new UrlWarriorGame() {
-    location.hash = _WELCOME_MSG;
+    _display(_WELCOME_MSG);
   }
   
   _onKeyUp(KeyboardEvent keyboardEvent){
     int keyCode = keyboardEvent.keyCode;
-    if(KeyCode.A<=keyCode && keyCode<=KeyCode.Z){
+    if(_game.running && KeyCode.A<=keyCode && keyCode<=KeyCode.Z){
       _game.reduce(keyCode);
       _refreshDisplay();
     } else if(!_game.running && keyCode == KeyCode.SPACE){
       _start();
+    } else if(!_game.running && keyCode == KeyCode.H){
+      _help();
     }
   }
   
@@ -47,13 +49,21 @@ class UrlWarriorGameManager {
     }
   }  
   
+  _help(){
+    _display("Press on your keyboard the letter which appears in the token. 1 point when you success, -2 when letter is absent. When there are more than 50 letters, you lose");
+  }
+  
   _refreshDisplay(){
-    location.hash = "Score=${_game.score}#${_game.sequence}";  
+    _display("Score=${_game.score}#${_game.sequence}");  
   }
 
   _displayEndScore(){
-    location.hash = "Score=${_game.score}";  
+    _display("Score=${_game.score}");  
   }  
+  
+  _display(String msg){
+    location.hash = msg;
+  }
   
 }
 
