@@ -14,10 +14,10 @@ class UrlWarriorGameManager {
   final UrlWarriorGame _game;
   Timer _gameTimer;
   final Location location;
-  //int _speed;
+  int _currentLevel = 0;
   
   UrlWarriorGameManager(this.location) : _game = new UrlWarriorGame() {
-    _display(_WELCOME_MSG);
+    _display = _WELCOME_MSG;
   }
   
   _onKeyUp(KeyboardEvent keyboardEvent){
@@ -34,36 +34,41 @@ class UrlWarriorGameManager {
   
   _start(){
     _game.start();
-    if(_gameTimer != null){
-      _gameTimer.cancel();
-    }
-    _gameTimer = new Timer.periodic(new Duration(seconds: 1), (_) => _gameLoop());
+    _adjustTimer();
   }
   
   _gameLoop(){
     if(_game.running){
       _game.generate();
       _refreshDisplay();
+      if(_currentLevel < _game.level){
+        _adjustTimer();
+        _currentLevel = _game.level;
+      }
     } else {
       _displayEndScore();
     }
   }  
   
+  _adjustTimer(){
+    if(_gameTimer != null){
+      _gameTimer.cancel();
+    }
+    var delay = 1000- _game.speed*10;
+    print(delay);
+    _gameTimer = new Timer.periodic(new Duration(milliseconds: delay), (_) => _gameLoop());    
+  }
+  
   _help(){
-    _display("Press on your keyboard the letter which appears in the token. 1 point when you success, -2 when letter is absent. When there are more than 50 letters, you lose");
+    // TODO display in page
+    _display = "Press on your keyboard the letter which appears in the token. 1 point when you success, -2 when letter is absent. When there are more than 50 letters, you lose";
   }
   
-  _refreshDisplay(){
-    _display("Score=${_game.score}#${_game.sequence}");  
-  }
+  _refreshDisplay() => _display = "Score=${_game.score}#${_game.sequence}";  
 
-  _displayEndScore(){
-    _display("Score=${_game.score}");  
-  }  
+  _displayEndScore() =>  _display = "Score=${_game.score}";  
   
-  _display(String msg){
-    location.hash = msg;
-  }
+  set _display(String msg) => location.hash = msg;
   
 }
 
@@ -96,12 +101,19 @@ class UrlWarriorGame {
     _sequence.removeWhere((e) => keyCode == e);
     var sizeAfter = _sequence.length;
     var diff = sizeBefore-sizeAfter;
-    if(diff == 0){// Bad touch !
+    if(diff == 0){// Bad touch, loose 2 point !
       _score-=2;
     } else {
-      _score+=(sizeBefore-sizeAfter);
+      // 1 point by letter and cumbo : 10 points by group of 5
+      _score+=(sizeBefore-sizeAfter)+((diff~/3)*5);
+      
     }
   }
+  
+  int get level => _score ~/ 5;
+  
+  // Thanks Tatiana for help finding this mathematical function
+  num get speed => (90*level*level)~/(level*level+4*level+1);
   
   String get sequence => new String.fromCharCodes(_sequence).toLowerCase();
   
