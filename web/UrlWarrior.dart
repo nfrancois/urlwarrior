@@ -10,7 +10,7 @@ main() {
 
 class UrlWarriorGameManager {
   
-  const String _WELCOME_MSG = "The Game is in the url. Press space to start ! Press 'H' for Help";
+  final String _WELCOME_MSG = "The Game is in the url. Press space to start ! Press 'H' for Help";
   final UrlWarriorGame _game;
   Timer _gameTimer;
   final Location location;
@@ -74,7 +74,7 @@ class UrlWarriorGameManager {
 
 class UrlWarriorGame {
 
-  const int _MAX_SIZE = 50;
+  final int _MAX_SIZE = 50;
   List<int> _sequence = [];
   int _score = 0;
   Random _random = new Random();
