@@ -23,7 +23,7 @@ class UrlWarriorGameManager {
   _onKeyUp(KeyboardEvent keyboardEvent){
     int keyCode = keyboardEvent.keyCode;
     if(_game.running && KeyCode.A<=keyCode && keyCode<=KeyCode.Z){
-      _game.reduce(keyCode);
+      _game.press(keyCode);
       _refreshDisplay();
     } else if(!_game.running && keyCode == KeyCode.SPACE){
       _start();
@@ -55,7 +55,6 @@ class UrlWarriorGameManager {
       _gameTimer.cancel();
     }
     var delay = 1000- _game.speed*10;
-    print(delay);
     _gameTimer = new Timer.periodic(new Duration(milliseconds: delay), (_) => _gameLoop());    
   }
   
@@ -64,9 +63,9 @@ class UrlWarriorGameManager {
     _display = "Press on your keyboard the letter which appears in the token. 1 point when you success, -2 when letter is absent. When there are more than 50 letters, you lose";
   }
   
-  _refreshDisplay() => _display = "Score=${_game.score}#${_game.sequence}";  
+  _refreshDisplay() => _display = "Level=${_currentLevel}_Score=${_game.score}#${_game.sequence}";  
 
-  _displayEndScore() =>  _display = "Score=${_game.score}";  
+  _displayEndScore() =>  _display = "Level=${_currentLevel}_Score=${_game.score}";  
   
   set _display(String msg) => location.hash = msg;
   
@@ -96,7 +95,7 @@ class UrlWarriorGame {
     }
   }
   
-  reduce(int keyCode){
+  press(int keyCode){
     var sizeBefore = _sequence.length;
     _sequence.removeWhere((e) => keyCode == e);
     var sizeAfter = _sequence.length;
